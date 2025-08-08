@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Tap-in / Tap-out Calculator</title>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg1: #f6f9ff;
+        --bg2: #eef7fb;
+        --card: rgba(255, 255, 255, 0.8);
+        --accent1: #3aa0ff;
+        --accent2: #7de3b7;
+        --muted: #667085;
+        --glass: rgba(255, 255, 255, 0.6);
+        --shadow: 0 8px 28px rgba(20, 30, 60, 0.08);
+        --radius: 14px;
+      }
+      * {
+        box-sizing: border-box;
+        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto,
+          "Helvetica Neue", Arial;
+      }
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        background: linear-gradient(160deg, var(--bg1), var(--bg2));
+        -webkit-font-smoothing: antialiased;
+      }
+      .wrap {
+        max-width: 940px;
+        margin: 32px auto;
+        padding: 28px;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .logo {
+        width: 64px;
+        height: 64px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        background: linear-gradient(135deg, var(--accent1), #6ea8ff);
+        color: white;
+        box-shadow: var(--shadow);
+      }
+      h1 {
+        margin: 0;
+        font-size: 20px;
+      }
+      p.lead {
+        margin: 2px 0 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 18px;
+      }
+      @media (max-width: 820px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+        .wrap {
+          padding: 18px;
+        }
+      }
+
+      .card {
+        background: var(--card);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border-radius: var(--radius);
+        padding: 18px;
+        box-shadow: var(--shadow);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+      }
+      .section-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 8px;
+      }
+      .section-title h2 {
+        font-size: 16px;
+        margin: 0;
+      }
+      .section-title span {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      label {
+        display: block;
+        font-size: 13px;
+        color: #123;
+        margin: 10px 0 6px;
+      }
+      input[type="time"],
+      input[type="number"],
+      input[type="text"] {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid #e6eef8;
+        background: transparent;
+        font-size: 15px;
+        outline: none;
+        box-shadow: none;
+      }
+      .row {
+        display: flex;
+        gap: 12px;
+      }
+      .row .col {
+        flex: 1;
+      }
+
+      .btn {
+        border: 0;
+        padding: 12px 14px;
+        border-radius: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.13s ease, box-shadow 0.13s ease;
+      }
+      .btn:active {
+        transform: translateY(1px);
+      }
+      .btn-primary {
+        background: linear-gradient(90deg, var(--accent1), #5fc0ff);
+        color: white;
+        box-shadow: 0 6px 18px rgba(56, 136, 255, 0.18);
+      }
+      .btn-green {
+        background: linear-gradient(90deg, #4ad29f, var(--accent2));
+        color: white;
+        box-shadow: 0 6px 18px rgba(60, 180, 140, 0.14);
+      }
+      .btn-ghost {
+        background: transparent;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        color: #123;
+      }
+
+      .result {
+        margin-top: 12px;
+        padding: 12px;
+        border-radius: 10px;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.9),
+          rgba(250, 255, 250, 0.9)
+        );
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        border: 1px solid rgba(0, 0, 0, 0.03);
+      }
+      .result .text {
+        font-weight: 700;
+        color: #044;
+        font-size: 15px;
+      }
+      .note {
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .small {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .muted {
+        color: var(--muted);
+      }
+
+      footer {
+        margin-top: 8px;
+        padding: 12px;
+        border-radius: 12px;
+        background: linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 0.5),
+          rgba(255, 255, 255, 0.4)
+        );
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .recent {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .chip {
+        background: rgba(10, 10, 10, 0.04);
+        padding: 8px 10px;
+        border-radius: 999px;
+        font-size: 13px;
+        cursor: pointer;
+      }
+
+      /* micro animations */
+      .pulse {
+        animation: pulse 2.6s ease-in-out infinite;
+      }
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.02);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      /* subtle icons */
+      .right {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .copy {
+        background: #fff;
+        padding: 8px;
+        border-radius: 10px;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        cursor: pointer;
+      }
+      .help {
+        font-size: 12px;
+        color: var(--muted);
+        display: block;
+        margin-top: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <header>
+        <div class="logo">🕒</div>
+        <div>
+          <h1>Tap-in / Tap-out Calculator</h1>
+          <p class="lead">
+            Quickly compute tap-out time or total hours. Designed for mobile &
+            desktop.
+          </p>
+        </div>
+      </header>
+
+      <div class="grid">
+        <!-- Tap-out Card -->
+        <section class="card pulse" aria-labelledby="calcTapTitle">
+          <div class="section-title">
+            <h2 id="calcTapTitle">📌 Calculate Tap-out Time</h2>
+            <span class="small">Enter tap-in & required hours</span>
+          </div>
+
+          <label for="tapInTime">⏰ Tap-in time</label>
+          <input id="tapInTime" type="time" aria-label="Tap in time" />
+
+          <label for="requiredHours"
+            >⏳ Required hours (decimals allowed)</label
+          >
+          <input
+            id="requiredHours"
+            type="number"
+            step="0.25"
+            min="0"
+            placeholder="e.g., 8 or 8.5"
+            aria-label="Required hours"
+          />
+
+          <div style="margin-top: 12px; display: flex; gap: 12px">
+            <button id="calcTapBtn" class="btn btn-primary" type="button">
+              🔍 Calculate Tap-out
+            </button>
+            <button id="saveTap" class="btn btn-ghost" type="button">
+              💾 Save
+            </button>
+          </div>
+
+          <div
+            id="tapResult"
+            class="result"
+            style="margin-top: 14px; display: none"
+          >
+            <div>
+              <div class="text" id="tapResultText">Tap-out at: ―</div>
+              <div class="note" id="tapResultNote"></div>
+            </div>
+            <div
+              style="
+                display: flex;
+                flex-direction: column;
+                align-items: flex-end;
+                gap: 8px;
+              "
+            >
+              <button id="copyTap" class="copy" title="Copy result">
+                Copy
+              </button>
+              <div class="small muted" id="tapSavedMsg" style="display: none">
+                Saved ✔
+              </div>
+            </div>
+          </div>
+
+          <p class="help">
+            Tip: use decimals for half/quarter hours (e.g., 8.25 = 8h15m).
+          </p>
+        </section>
+
+        <!-- Duration Card -->
+        <section class="card" aria-labelledby="calcDurTitle">
+          <div class="section-title">
+            <h2 id="calcDurTitle">📌 Calculate Total Time Worked</h2>
+            <span class="small">Entry & exit (handles overnight)</span>
+          </div>
+
+          <label for="entryTime">📥 Entry time</label>
+          <input id="entryTime" type="time" aria-label="Entry time" />
+
+          <label for="exitTime">📤 Exit time</label>
+          <input id="exitTime" type="time" aria-label="Exit time" />
+
+          <div style="margin-top: 12px; display: flex; gap: 12px">
+            <button id="calcDurBtn" class="btn btn-green" type="button">
+              ⏱ Calculate Total Hours
+            </button>
+            <button id="saveDur" class="btn btn-ghost" type="button">
+              💾 Save
+            </button>
+          </div>
+
+          <div
+            id="durResult"
+            class="result"
+            style="margin-top: 14px; display: none"
+          >
+            <div>
+              <div class="text" id="durResultText">Total Time: ―</div>
+              <div class="note" id="durResultNote"></div>
+            </div>
+            <div
+              style="
+                display: flex;
+                flex-direction: column;
+                align-items: flex-end;
+                gap: 8px;
+              "
+            >
+              <button id="copyDur" class="copy" title="Copy result">
+                Copy
+              </button>
+              <div class="small muted" id="durSavedMsg" style="display: none">
+                Saved ✔
+              </div>
+            </div>
+          </div>
+
+          <p class="help">
+            If exit time is earlier than entry, the app assumes exit is next
+            day.
+          </p>
+        </section>
+      </div>
+
+      <footer class="card" aria-live="polite">
+        <div>
+          <div style="font-weight: 700">Recent entries</div>
+          <div class="muted small">Tap a chip to autofill inputs</div>
+        </div>
+        <div class="recent" id="recentList" aria-hidden="false"></div>
+      </footer>
+    </main>
+
+    <script>
+      (function () {
+        // helpers
+        const byId = (id) => document.getElementById(id);
+        const format12 = (date) => {
+          // Expect JS Date object
+          let hrs = date.getHours();
+          let mins = date.getMinutes();
+          const ampm = hrs >= 12 ? "PM" : "AM";
+          hrs = hrs % 12 || 12;
+          const mm = String(mins).padStart(2, "0");
+          return `${hrs}:${mm} ${ampm}`;
+        };
+        const msToHoursMinutes = (ms) => {
+          const totalMin = Math.round(ms / 60000);
+          const h = Math.floor(totalMin / 60);
+          const m = totalMin % 60;
+          return { h, m };
+        };
+
+        // DOM
+        const tapInTime = byId("tapInTime");
+        const requiredHours = byId("requiredHours");
+        const calcTapBtn = byId("calcTapBtn");
+        const tapResult = byId("tapResult");
+        const tapResultText = byId("tapResultText");
+        const tapResultNote = byId("tapResultNote");
+        const copyTap = byId("copyTap");
+        const saveTap = byId("saveTap");
+        const tapSavedMsg = byId("tapSavedMsg");
+
+        const entryTime = byId("entryTime");
+        const exitTime = byId("exitTime");
+        const calcDurBtn = byId("calcDurBtn");
+        const durResult = byId("durResult");
+        const durResultText = byId("durResultText");
+        const durResultNote = byId("durResultNote");
+        const copyDur = byId("copyDur");
+        const saveDur = byId("saveDur");
+        const durSavedMsg = byId("durSavedMsg");
+
+        const recentList = byId("recentList");
+
+        // storage keys
+        const KEY_RECENT = "tapcalc_recent_v1";
+        const MAX_RECENT = 8;
+
+        function loadRecent() {
+          try {
+            const raw = localStorage.getItem(KEY_RECENT);
+            return raw ? JSON.parse(raw) : [];
+          } catch (e) {
+            return [];
+          }
+        }
+        function saveRecent(obj) {
+          let arr = loadRecent();
+          // avoid duplicates (same type + values)
+          arr = arr.filter((r) => JSON.stringify(r) !== JSON.stringify(obj));
+          arr.unshift(obj);
+          if (arr.length > MAX_RECENT) arr = arr.slice(0, MAX_RECENT);
+          localStorage.setItem(KEY_RECENT, JSON.stringify(arr));
+          renderRecent();
+        }
+        function renderRecent() {
+          const arr = loadRecent();
+          recentList.innerHTML = "";
+          arr.forEach((r, i) => {
+            const el = document.createElement("button");
+            el.className = "chip";
+            if (r.type === "tap")
+              el.textContent = `Tap ${r.time} + ${r.hours}h`;
+            else el.textContent = `Dur ${r.entry} → ${r.exit}`;
+            el.addEventListener("click", () => {
+              if (r.type === "tap") {
+                tapInTime.value = r.time;
+                requiredHours.value = r.hours;
+              } else {
+                entryTime.value = r.entry;
+                exitTime.value = r.exit;
+              }
+              // small animation
+              el.style.transform = "scale(0.98)";
+              setTimeout(() => (el.style.transform = ""), 160);
+            });
+            recentList.appendChild(el);
+          });
+          if (arr.length === 0) {
+            const no = document.createElement("div");
+            no.className = "muted small";
+            no.textContent = "No recent saves — save tap or duration results.";
+            recentList.appendChild(no);
+          }
+        }
+
+        // Calculate Tap-out
+        calcTapBtn.addEventListener("click", () => {
+          tapSavedMsg.style.display = "none";
+          const t = tapInTime.value;
+          const hrsRaw = requiredHours.value.trim();
+          if (!t) {
+            showTap("❌ Please choose tap-in time", true);
+            return;
+          }
+          if (hrsRaw === "") {
+            showTap("❌ Please enter required hours", true);
+            return;
+          }
+          const hrs = parseFloat(hrsRaw);
+          if (isNaN(hrs) || hrs < 0) {
+            showTap("❌ Invalid number of hours", true);
+            return;
+          }
+
+          // parse time string "HH:MM"
+          const [hh, mm] = t.split(":").map(Number);
+          const now = new Date();
+          const entry = new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate(),
+            hh,
+            mm,
+            0
+          );
+
+          // add hours (allow fractional)
+          const msAdd = Math.round(hrs * 3600 * 1000);
+          const tapOut = new Date(entry.getTime() + msAdd);
+
+          const nextDay = tapOut.getDate() !== entry.getDate();
+          tapResultText.textContent = `📅 Tap-out at: ${format12(tapOut)}`;
+          tapResultNote.textContent = nextDay
+            ? "Note: tap-out is on the next day."
+            : "";
+          tapResult.style.display = "flex";
+        });
+
+        function showTap(msg, isError = false) {
+          tapResultText.textContent = msg;
+          tapResultNote.textContent = isError ? "" : "";
+          tapResult.style.display = "flex";
+        }
+
+        // Calculate Duration
+        calcDurBtn.addEventListener("click", () => {
+          durSavedMsg.style.display = "none";
+          const e = entryTime.value;
+          const x = exitTime.value;
+          if (!e || !x) {
+            showDur("❌ Please choose both entry and exit times", true);
+            return;
+          }
+
+          const [eh, em] = e.split(":").map(Number);
+          const [xh, xm] = x.split(":").map(Number);
+          const now = new Date();
+          let entry = new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate(),
+            eh,
+            em,
+            0
+          );
+          let exit = new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate(),
+            xh,
+            xm,
+            0
+          );
+
+          // If exit earlier -> assume next day
+          let nextDay = false;
+          if (exit < entry) {
+            exit = new Date(exit.getTime() + 24 * 3600 * 1000);
+            nextDay = true;
+          }
+
+          const diffMs = exit - entry;
+          if (diffMs < 0) {
+            showDur("❌ Invalid times", true);
+            return;
+          }
+          const { h, m } = msToHoursMinutes(diffMs);
+          durResultText.textContent = `✅ Total Time: ${h} hours ${m} minutes`;
+          durResultNote.textContent = nextDay
+            ? "This includes an overnight period (exit next day)."
+            : "";
+          durResult.style.display = "flex";
+        });
+
+        function showDur(msg, isError = false) {
+          durResultText.textContent = msg;
+          durResultNote.textContent = isError ? "" : "";
+          durResult.style.display = "flex";
+        }
+
+        // Copy buttons
+        copyTap.addEventListener("click", () => {
+          const txt =
+            tapResultText.textContent +
+            (tapResultNote.textContent
+              ? " — " + tapResultNote.textContent
+              : "");
+          navigator.clipboard
+            ?.writeText(txt)
+            .then(() => {
+              copyTap.textContent = "Copied ✔";
+              setTimeout(() => (copyTap.textContent = "Copy"), 1200);
+            })
+            .catch(() => {
+              copyTap.textContent = "Copied";
+              setTimeout(() => (copyTap.textContent = "Copy"), 1200);
+            });
+        });
+
+        copyDur.addEventListener("click", () => {
+          const txt =
+            durResultText.textContent +
+            (durResultNote.textContent
+              ? " — " + durResultNote.textContent
+              : "");
+          navigator.clipboard
+            ?.writeText(txt)
+            .then(() => {
+              copyDur.textContent = "Copied ✔";
+              setTimeout(() => (copyDur.textContent = "Copy"), 1200);
+            })
+            .catch(() => {
+              copyDur.textContent = "Copied";
+              setTimeout(() => (copyDur.textContent = "Copy"), 1200);
+            });
+        });
+
+        // Save buttons store to recent
+        saveTap.addEventListener("click", () => {
+          const t = tapInTime.value;
+          const hrsRaw = requiredHours.value.trim();
+          if (!t || hrsRaw === "") return;
+          saveRecent({ type: "tap", time: t, hours: hrsRaw });
+          tapSavedMsg.style.display = "block";
+          setTimeout(() => (tapSavedMsg.style.display = "none"), 1400);
+        });
+
+        saveDur.addEventListener("click", () => {
+          const e = entryTime.value;
+          const x = exitTime.value;
+          if (!e || !x) return;
+          saveRecent({ type: "dur", entry: e, exit: x });
+          durSavedMsg.style.display = "block";
+          setTimeout(() => (durSavedMsg.style.display = "none"), 1400);
+        });
+
+        // initialize
+        renderRecent();
+
+        // preload examples for first-time users
+        if (!localStorage.getItem(KEY_RECENT)) {
+          const defaults = [
+            { type: "tap", time: "09:15", hours: "8" },
+            { type: "tap", time: "22:30", hours: "8" },
+            { type: "dur", entry: "09:00", exit: "17:30" },
+          ];
+          localStorage.setItem(KEY_RECENT, JSON.stringify(defaults));
+          renderRecent();
+        }
+      })();
+    </script>
+  </body>
+</html>
